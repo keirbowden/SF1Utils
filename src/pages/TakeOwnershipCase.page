@@ -1,0 +1,5 @@
+<apex:page standardController="Case" applyHtmlTag="false" showheader="false" standardstylesheets="false">
+  <html>
+    <c:TakeOwnership typeName="{!$ObjectType.Case.Name}" typeLabel="{!$ObjectType.Case.label}" recordId="{!Case.id}" />
+  </html>
+</apex:page>

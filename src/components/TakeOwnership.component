@@ -1,0 +1,132 @@
+<apex:component controller="TakeOwnershipController">
+  <apex:attribute name="typeName" description="The type of sobject to take ownership of" type="String" />
+  <apex:attribute name="typeLabel" description="The friendly label of the sobject to take ownership of" type="String" />
+  <apex:attribute name="recordId" description="Id of the record to take ownership of" type="String" />
+    <head>
+      <apex:includescript value="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" />
+      
+      <!--  JQuery block - greys out the page -->
+      <apex:includescript value="{!$Resource.jqBlock}" />
+      
+      <!-- Bootstrap responsive UI framework -->
+      <apex:stylesheet value="{!URLFOR($Resource.bootstrap_3_0_3, 'dist/css/bootstrap.min.css')}"/>
+      <apex:stylesheet value="{!URLFOR($Resource.bootstrap_3_0_3, 'dist/css/bootstrap-theme.min.css')}"/>
+      <apex:includeScript value="{!URLFOR($Resource.bootstrap_3_0_3, 'dist/js/bootstrap.min.js')}"/>
+      
+      <!-- Alertify - great looking logging -->
+	  <apex:stylesheet value="{!URLFOR($Resource.alertify_0_3_11, 'alertify.js-0.3.11/themes/alertify.core.css')}"/>
+      <apex:stylesheet value="{!URLFOR($Resource.alertify_0_3_11, 'alertify.js-0.3.11/themes/alertify.default.css')}"/>
+   	  <apex:includeScript value="{!URLFOR($Resource.alertify_0_3_11, 'alertify.js-0.3.11/lib/alertify.min.js')}"/>
+   	  
+      <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+    </head>
+    
+    <body>
+        <div class="container" style="overflow:auto;">
+          <div class="row top-buffer">
+            <div class="col-md-12">
+              <div class="alert alert-warning">
+                 Are you sure?
+              </div>
+            </div>
+          </div>
+          <div class="row top-buffer">
+            <div class="col-md-12">
+              <p>If you are sure you wish to take ownership of this {!typeLabel}, tap the 'Submit' button, otherwise tap 'Cancel' to return to the record.</p>
+            </div>
+          </div>
+        </div>
+          <div class="row top-buffer" id="buttons" style="display: none">
+            <div class="col-md-6 pull-left">
+  			  <button type="button" class="btn btn-default" id="cancelbtn">Cancel</button>
+		    </div>
+            <div class="col-md-6 pull-right">
+			  <button type="button" class="btn btn-primary" id="submitbtn">Submit</button>
+		    </div>
+		  </div>
+    	<div id="working" style="display:none">
+          <div style="margin-bottom:0px" class="progress progress-striped active">
+            <div class="progress-bar" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            </div>
+  	      </div>
+  	    </div>
+    	<br/><br/>
+    <script>
+   	   var sf1=false;
+       $(document).ready(function(){
+			if ( (typeof sforce != 'undefined') && (sforce != null) ) {
+				sf1=true;
+            	Sfdc.canvas.publisher.subscribe({name: "publisher.post", onData:function(e) {
+                	// This subscribe fires when the user hits 'Submit' in the publisher
+                	takeOwnership();
+             	}});
+                                                        
+	            Sfdc.canvas.publisher.publish({name: "publisher.setValidForSubmit", payload:"true"});
+	            $('#buttons').remove();
+			}
+			else
+			{
+			   $('#buttons').toggle();
+			   $('#cancelbtn').on('click', function() {
+					$.blockUI( { message: $('#working') } );
+					closeAction();
+			   });
+			   $('#submitbtn').on('click', function() {
+			   		takeOwnership();
+			   });
+			}
+   		});
+                     
+	function takeOwnership()
+	{
+		$.blockUI( { message: $('#working') } );
+		
+		try
+		{
+			TakeOwnershipController.TakeOwnership('{!typeName}', '{!recordId}', processResult);
+		}
+		catch (e)
+		{
+			alertify.error('Caught exception : ' + e);
+			$.unblockUI();
+		}     
+	}
+  
+  	function closeAction()
+  	{
+  		if (sf1)
+  		{
+			Sfdc.canvas.publisher.publish({name: "publisher.close", 
+								payload:{ refresh:"true"}});
+		}
+		else
+		{
+			window.top.location.reload();
+		}
+	} 
+  	
+	function processResult(result, event)
+	{
+		$.unblockUI();
+		if (event.status) 
+		{
+			if (result=='SUCCESS')
+			{
+			    alertify.success('{!typeName} accepted');
+			    setTimeout(closeAction,
+            	    	   3000);
+			}
+			else
+			{
+			    alertify.error('Error: ' + result);
+			}
+		}
+		else
+		{
+			alertify.error('Remoting error : ' + event.message);
+		}
+	}
+
+    </script>
+  </body>
+</apex:component>

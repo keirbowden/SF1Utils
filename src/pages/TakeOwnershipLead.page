@@ -1,0 +1,5 @@
+<apex:page standardController="Lead" applyHtmlTag="false" showheader="false" standardstylesheets="false">
+  <html>
+    <c:TakeOwnership typeName="{!$ObjectType.Lead.Name}" typeLabel="{!$ObjectType.Lead.label}" recordId="{!Lead.id}" />
+  </html>
+</apex:page>

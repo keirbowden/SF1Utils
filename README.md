@@ -13,7 +13,7 @@ https://login.salesforce.com/packaging/installPackage.apexp?p0=04ti0000000LJ5v
 Take Ownership
 ==============
 
-(For more information see: 
+(For more information see the introductory blog post at : http://bobbuzz.me.uk/1y7QmeU)
 
 If you haven't already, enable chatter and turn on feed tracking for leads and cases.
 Edit the page layouts for lead and case, and add the Take Ownership publisher action.

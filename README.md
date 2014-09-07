@@ -8,7 +8,7 @@ Instructions
 
 To access all functionality, install the managed package available at:
 
-https://login.salesforce.com/packaging/installPackage.apexp?p0=04ti0000000LJ5v
+https://login.salesforce.com/packaging/installPackage.apexp?p0=04ti0000000LJ60
 
 Take Ownership
 ==============

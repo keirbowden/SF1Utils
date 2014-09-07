@@ -24,13 +24,13 @@ private class MentionUtils_Test
 	{
 		User user=setupUser('user1@unit.test', 'System Administrator');
 		
-		List<FeedItem> feedItems=[select id from FeedItem where ParentId=:user.id];
-		System.assertEquals(0, feedItems.size());
+		List<FeedItem> feedItems=[select id from FeedItem where ParentId=:UserInfo.getUserId()];
+		Integer postCount=feedItems.size();
 		
 		MentionUtils.NotifyUser(user.id, 'Test Message');
 
-		// should now be one post on the user feed		
-		feedItems=[select id from FeedItem where ParentId=:user.id];
-		System.assertEquals(1, feedItems.size());
+		// should now be one post on the context user feed		
+		feedItems=[select id from FeedItem where ParentId=:UserInfo.getUserId()];
+		System.assertEquals(postCount+1, feedItems.size());
 	}
 }

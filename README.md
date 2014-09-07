@@ -22,8 +22,9 @@ Open the Salesforce1 application and take ownership of whatever records you are 
 Notifications
 =============
 
-(For more information see the blog post at: 
+(For more information see the blog post at: http://bobbuzz.me.uk/1nE4tSv)
 
+If you haven't already, enable chatter.
 Notify a user from Apex, executing code similar to the following:
 ```
 User notifyUser=[select id from User where username like 'keir.chatter%'];

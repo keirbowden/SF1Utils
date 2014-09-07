@@ -27,5 +27,5 @@ Notifications
 Notify a user from Apex, executing code similar to the following:
 ```
 User notifyUser=[select id from User where username like 'keir.chatter%'];
-MentionUtils.NotifyUser(notifyUser.id, 'Test Notification');
+MentionUtils.NotifyUser(notifyUser.id, ' Test Notification');
 ```

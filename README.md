@@ -33,7 +33,7 @@ MentionUtils.NotifyUser(notifyUser.id, ' Test Notification');
 Alertify
 ========
 
-(For more information see the blog post at: )
+(For more information see the blog post at: http://bobbuzz.me.uk/1pXgges)
 
 If you haven't already, enable chatter.
 Edit the global publisher layout and add the 'Check In' publisher action.

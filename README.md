@@ -8,7 +8,7 @@ Instructions
 
 To access all functionality, install the managed package available at:
 
-https://login.salesforce.com/packaging/installPackage.apexp?p0=04ti0000000LJ60
+https://login.salesforce.com/packaging/installPackage.apexp?p0=04ti0000000LKi1
 
 Take Ownership
 ==============
@@ -30,3 +30,11 @@ Notify a user from Apex, executing code similar to the following:
 User notifyUser=[select id from User where username like 'keir.chatter%'];
 MentionUtils.NotifyUser(notifyUser.id, ' Test Notification');
 ```
+Alertify
+========
+
+(For more information see the blog post at: )
+
+If you haven't already, enable chatter.
+Edit the global publisher layout and add the 'Check In' publisher action.
+Open the Salesforce1 application and choose 'Check In' from the publisher actions.

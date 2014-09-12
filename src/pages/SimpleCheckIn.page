@@ -1,0 +1,162 @@
+<apex:page controller="SimpleCheckinCtrl" docType="html-5.0" applyHtmlTag="false" showheader="false" standardstylesheets="false">
+  <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"></meta>
+      
+      <apex:includescript value="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" />
+
+      <!-- alertify -->
+      <apex:stylesheet value="{!URLFOR($Resource.alertify, 'alertify.js-0.3.11/themes/alertify.core.css')}"/>
+      <apex:stylesheet value="{!URLFOR($Resource.alertify, 'alertify.js-0.3.11/themes/alertify.bootstrap.css')}"/>
+      <apex:includeScript value="{!URLFOR($Resource.alertify_0_3_11, 'alertify.js-0.3.11/lib/alertify.min.js')}"/>
+
+      <!-- Bootstrap -->
+      <apex:stylesheet value="{!URLFOR($Resource.bootstrap_3_0_3, 'dist/css/bootstrap.min.css')}"/>
+      <apex:stylesheet value="{!URLFOR($Resource.bootstrap_3_0_3, 'dist/css/bootstrap-theme.min.css')}"/>
+      <apex:includeScript value="{!URLFOR($Resource.bootstrap_3_0_3, 'dist/js/bootstrap.min.js')}"/>
+      <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+      
+      <style>
+		.alertify-logs {
+		    top: 150px;
+    		right: 10px;
+		}	
+	  </style>
+    </head>
+    
+    <body>
+      <form id="form form-horizontal">
+        <div class="container" style="overflow:auto;">
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="form-group">
+  		        <div class="input-group">
+  				  <span class="input-group-addon"><span class="glyphicon glyphicon-info-sign"></span></span>
+				  <textarea class="form-control" rows="3" style="width:90%" name="details" id="details" placeholder="details"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+    	<br/><br/>
+    	<div id="working" style="display:none">
+          <div style="margin-bottom:0px" class="progress progress-striped active">
+            <div class="progress-bar" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            </div>
+  	      </div>
+  	    </div>
+  	  </div>
+    </form>
+    <script>
+   	   var sf1=false;
+       $(document).ready(function(){
+			if ( (typeof sforce != 'undefined') && (sforce != null) ) {
+				sf1=true;
+            	Sfdc.canvas.publisher.subscribe({name: "publisher.post", onData:function(e) {
+                	// This subscribe fires when the user hits 'Submit' in the publisher
+                	submitted();
+             	}});
+                                                        
+	            Sfdc.canvas.publisher.publish({name: "publisher.setValidForSubmit", payload:"true"});
+			}
+
+   		});
+	  
+	function saveItem()
+	{
+    	$('#working').toggle();
+    	
+		if (navigator.geolocation)
+        {
+        	navigator.geolocation.getCurrentPosition(geoSuccess,
+           								        	 geoError,
+    		       									 {
+        										    	maximumAge: 0,
+        												timeout:30000,
+        												enableHighAccuracy: true
+    											  	}
+			   								 	);
+              
+        }
+        else
+        {
+            alertify.error('Geolocation not supported');
+        }  
+
+ 	    return false;  
+    }
+    
+    function geoError(error) 
+    {
+ 	    var code='';
+        if (error.code == error.PERMISSION_DENIED) 
+        {
+            code='Permission Denied';
+        }
+        else if (error.code == POSITION_UNAVAILABLE)
+        {
+            code='Position Unavailable';
+        }
+        else if (error.code == TIMEOUT)
+        {
+            code='Timeout';
+        }
+		            
+        alertify.error('Unable to capture location : ' + code);
+    }
+    
+    /* function invoked when the geolocation has completed to save the item */    
+    function geoSuccess(position)
+    {  
+        saveToServer(position.coords.latitude, position.coords.longitude);
+    }
+    
+    function saveToServer(lat, long)
+    {
+    	var details=$("#details").val();
+
+		try
+		{
+			SimpleCheckinCtrl.Checkin('{!$User.id}', details, lat, long, processResult);
+		}
+		catch (e)
+		{
+			alertify.error('Save failed : ' + e.getMessage());
+		}	   
+	}
+  
+  	function closeAction()
+  	{
+		Sfdc.canvas.publisher.publish({name: "publisher.close", 
+							payload:{ feed:"true", refresh:"true"}});
+	} 
+  	
+	function processResult(result, event)
+	{
+		$('#working').toggle();
+		if (event.status) 
+		{
+			if (result=='SUCCESS')
+			{
+				alertify.success('Check In Completed');
+				setTimeout(closeAction, 3000);
+			}
+			else
+			{
+				alertify.error('Checkin failed : ' + result);
+			}
+		}
+		else
+		{
+			alertify.error('Remoting error : ' + event.message);
+		}
+	}
+	
+
+	  function submitted() {
+	  	saveItem();
+	  }
+    </script>
+  </body>
+   
+</html>
+</apex:page>
